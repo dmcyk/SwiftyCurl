@@ -6,7 +6,7 @@
 //
 //
 import cURL
-
+import Foundation
 /**
  Swift curl wrapper 
  */
@@ -58,7 +58,7 @@ public class cURL {
      - parameter option:CurlSetOption option to set
      - parameter value:UnsafeMutablePointer<curl_slist> slist pointer
      */
-    public func setSlist(_ option: cURLSetOption, value: UnsafeMutablePointer<curl_slist>) {
+    public func setSlist(_ option: cURLSetOption, value: UnsafeMutablePointer<curl_slist>?) {
         curl_easy_setopt_slist(rawCURL, option.raw, value)
     }
     
@@ -130,28 +130,26 @@ public class cURL {
         curl_easy_setopt_func(rawCURL, CURLOPT_WRITEFUNCTION) { (data, size, nmemb, userData) -> Int in
 
             if nmemb > 0, let response = userData?.assumingMemoryBound(to: cURLResponse.self),
-                let characters = data?.assumingMemoryBound(to: CChar.self) {
+                let characters = data?.assumingMemoryBound(to: UInt8.self) {
                 
-                let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: size * nmemb + 1)
-                strcpy(buffer, characters)
-                buffer[size * nmemb] = 0
-                var resultString = String(cString: buffer)
-                if case .trimNewLineCharacters = response.pointee.parseMode {
-                    resultString.trimHTTPNewline()
+                if response.pointee.body == nil {
+                    let buffer = Array(characters.withMemoryRebound(to: UInt8.self, capacity: nmemb) {
+                        UnsafeBufferPointer(start: $0, count: nmemb)
+                    })
+                    response.pointee.body = Data(bytes: buffer)
+                } else {
+                    response.pointee.body?.append(characters, count: nmemb)
                 }
-                response.pointee.body.append(resultString)
                 
-                buffer.deinitialize()
-                buffer.deallocate(capacity: size * nmemb + 1)
             }
             
             return size * nmemb
         }
         curl_easy_setopt_func(rawCURL, CURLOPT_HEADERFUNCTION) { (data, size, nmemb, userData) -> Int in
             if nmemb > 0, let response = userData?.assumingMemoryBound(to: cURLResponse.self),
-                let characters = data?.assumingMemoryBound(to: CChar.self) {
+                let characters = data?.assumingMemoryBound(to: Int8.self) {
 
-                let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: size * nmemb + 1)
+                let buffer = UnsafeMutablePointer<Int8>.allocate(capacity: size * nmemb + 1)
                 strcpy(buffer, characters)
                 buffer[size * nmemb] = 0
                 var resultString = String(cString: buffer)

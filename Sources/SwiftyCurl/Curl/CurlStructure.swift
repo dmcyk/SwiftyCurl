@@ -159,7 +159,7 @@ public struct cURLResponse {
     /**
      response body
      */
-    public var body = String()
+    public var body: Data?  = nil 
     
     let parseMode: cURLParseOption
     
@@ -190,6 +190,7 @@ public struct cURLRequest {
             if case .json = contentType {
                 var headers = rawHeaders
                 headers["Content-Type"] = "application/json"
+                headers["Accept"] = "application/json"
                 return headers 
             }
             return rawHeaders
@@ -198,7 +199,14 @@ public struct cURLRequest {
     
     public var method: cURLRequestMethod
     
-    public var body: String
+    public var body: Data? = nil
+    
+    public init(url: URL, method: cURLRequestMethod = .get, headers: [String: String] = [:], body: Data? = nil) {
+        self.url = url
+        self.method = method
+        self.rawHeaders = headers
+        self.body = body 
+    }
 }
 
 /**
