@@ -142,7 +142,7 @@ open class cURLConnection {
 //        curl.set(.sslEngineDefault, value: true)
     }
     public enum Error: Swift.Error {
-        case incorrectURL, headerSlist
+        case incorrectURL
     }
     
     
@@ -169,6 +169,8 @@ open class cURLConnection {
         self.url = urlStr
         if let prt = port, let portValue = Int(prt) {
             self.port = portValue
+        } else {
+            self.port = 80
         }
     }
     
@@ -176,11 +178,9 @@ open class cURLConnection {
         
         try setURLFrom(request: req)
         let httpHeaders = req.headers.map {
-            return "\($0.key):\($0.value)"
+            return "\($0.key): \($0.value)"
         }
-        guard let curlSlist = cURLSlist(fromArray: httpHeaders) else {
-            throw Error.headerSlist
-        }
+        let curlSlist = cURLSlist(fromArray: httpHeaders)
         curl.setSlist(.httpHeader, value: curlSlist.rawSlist)
         curl.set(.get, value: false)
         curl.set(.post, value: false)
@@ -196,7 +196,8 @@ open class cURLConnection {
         }
         
         
-        return try curl.execute()
+        let result = try curl.execute() // persist reference to header's slist 
+        return result 
     }
 }
 
