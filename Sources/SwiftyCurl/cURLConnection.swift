@@ -5,7 +5,11 @@
 //  Created by Damian Malarczyk on 04.07.2016.
 //
 //
-import libc
+#if os(Linux)
+    @_exported import Glibc
+#else
+    @_exported import Darwin.C
+#endif
 import cURL
 import Foundation
 
