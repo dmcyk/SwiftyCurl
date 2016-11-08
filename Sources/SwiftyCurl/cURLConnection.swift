@@ -189,6 +189,12 @@ open class cURLConnection {
         curl.set(.post, value: false)
         curl.set(.delete, value: nil)
 
+        if let body = req.body {
+            body.withUnsafeBytes {
+                curl.set(.postFields, value: $0)
+            }
+        }
+        
         switch req.method {
         case .get:
             curl.set(.get, value: true)
