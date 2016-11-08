@@ -5,7 +5,7 @@
 //  Created by Damian Malarczyk on 13.07.2016.
 //
 //
-import cURL
+import CCurl
 import Foundation
 /**
  * Swift wrapper for curl_getinfo options
@@ -136,7 +136,8 @@ public enum cURLSetOption: Hashable {
  * curl types enum, to allow setting many options at once
  */
 public enum cURLOptionType {
-    case int(Int), upInt8(UnsafePointer<Int8>), int64(Int64),
+    case int(Int), upInt8(UnsafePointer<Int8>),
+    //, int64(Int64),
     umpCurlSlist(UnsafeMutablePointer<curl_slist>), umpVoid(UnsafeMutableRawPointer)
 }
 

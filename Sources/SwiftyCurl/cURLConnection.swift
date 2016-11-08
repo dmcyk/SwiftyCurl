@@ -10,11 +10,10 @@
 #else
     @_exported import Darwin.C
 #endif
-import cURL
+import CCurl
 import Foundation
 
 /**
- * Abstract class for curl HTTP/2 certificate based connection 
  */
 open class cURLConnection {
     

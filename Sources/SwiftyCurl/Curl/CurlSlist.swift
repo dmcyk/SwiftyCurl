@@ -5,7 +5,7 @@
 //  Created by Damian Malarczyk on 07.07.2016.
 //
 //
-import cURL
+import CCurl
 
 /**
  Swift curl's slist wrapper

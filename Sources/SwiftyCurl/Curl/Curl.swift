@@ -5,7 +5,7 @@
 //  Created by Damian Malarczyk on 04.07.2016.
 //
 //
-import cURL
+import CCurl
 import Foundation
 /**
  Swift curl wrapper 
@@ -33,7 +33,7 @@ public class cURL {
      - parameter value:Int value for option
      */
     public func set(_ option: cURLSetOption, value: Int) {
-        curl_easy_setopt_long(rawCURL, option.raw, value)
+        curlHelperSetOptInt(rawCURL, option.raw, value)
     }
     
     
@@ -42,24 +42,16 @@ public class cURL {
      - parameter value:UnsafePointer<Int8> value for option
      */
     public func set(_ option: cURLSetOption, value: UnsafePointer<Int8>?) {
-        curl_easy_setopt_cstr(rawCURL, option.raw, value)
+        curlHelperSetOptString(rawCURL, option.raw, value)
     }
-    
-    /**
-     - parameter option:CurlSetOption option to set
-     - parameter value:Int64 value for option
-     */
-    public func set(_ option: cURLSetOption, value: Int64) {
-        curl_easy_setopt_int64(rawCURL, option.raw, value)
 
-    }
     
     /**
      - parameter option:CurlSetOption option to set
      - parameter value:UnsafeMutablePointer<curl_slist> slist pointer
      */
     public func setSlist(_ option: cURLSetOption, value: UnsafeMutablePointer<curl_slist>?) {
-        curl_easy_setopt_slist(rawCURL, option.raw, value)
+        curlHelperSetOptList(rawCURL, option.raw, value)
     }
     
     /**
@@ -67,15 +59,15 @@ public class cURL {
      - parameter value:UnsafeMutablePointer<Void> value for option
      */
     public func set(_ option: cURLSetOption, value: UnsafeMutableRawPointer) {
-        curl_easy_setopt_void(rawCURL, option.raw, value)
+        curlHelperSetOptVoid(rawCURL, option.raw, value)
     }
-    
+
     /**
      - parameter option:CurlSetOption option to set
      - parameter value:Bool value for option
      */
     public func set(_ option: cURLSetOption, value: Bool) {
-        curl_easy_setopt_long(rawCURL, option.raw, value ? 1 : 0)
+        curlHelperSetOptBool(rawCURL, option.raw, value ? 1 : 0)
     }
     
     /**
@@ -85,8 +77,6 @@ public class cURL {
     public func set(_ option: cURLSetOption, optionType: cURLOptionType) {
         switch optionType {
         case .int(let val):
-            set(option, value: val)
-        case .int64(let val):
             set(option, value: val)
         case .upInt8(let val):
             set(option, value: val)
@@ -113,7 +103,7 @@ public class cURL {
      */
     public func get(_ option: cURLGetOption) -> Int {
         var result = 0
-        curl_easy_getinfo_long(rawCURL, option.raw, &result)
+        curlHelperGetInfoLong(rawCURL, option.raw, &result)
         return result
     }
     
@@ -125,8 +115,9 @@ public class cURL {
         var response = cURLResponse(parseMode: parseMode)
         let responsePointer = withUnsafeMutablePointer(to: &response) { UnsafeMutableRawPointer($0) }
         
-        curl_easy_setopt_void(rawCURL, CURLOPT_HEADERDATA, responsePointer)
-        curl_easy_setopt_void(rawCURL, CURLOPT_WRITEDATA, responsePointer)
+        curlHelperSetOptVoid(rawCURL, CURLOPT_HEADERDATA, responsePointer)
+        curlHelperSetOptVoid(rawCURL, CURLOPT_WRITEDATA, responsePointer)
+
         curl_easy_setopt_func(rawCURL, CURLOPT_WRITEFUNCTION) { (data, size, nmemb, userData) -> Int in
 
             if nmemb > 0, let response = userData?.assumingMemoryBound(to: cURLResponse.self),
