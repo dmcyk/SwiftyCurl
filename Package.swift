@@ -9,7 +9,7 @@ let package = Package(
 	
     ],
     dependencies: [
-        .Package(url: "https://github.com/PerfectlySoft/Perfect-libcurl.git", majorVersion: 0)
+        .Package(url: "https://github.com/osjup/CCurl.git", majorVersion: 0, minor: 2)
     ],
     exclude: [
         "Example"
