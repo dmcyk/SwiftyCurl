@@ -180,28 +180,27 @@ open class cURLConnection {
     
     
     func setURLFrom(request: cURLRequest) throws {
-        var urlString: String?
 
-        var port: String?
-        let cmp = URLComponents(url: request.url, resolvingAgainstBaseURL: true)
-        
-        if let urlStr: String = cmp?.string, let portRange = cmp?.rangeOfPort {
-            
-            let colonRange = Range<String.Index>(uncheckedBounds: (urlStr.index(before: portRange.lowerBound),portRange.upperBound))
-            port = cmp?.string?.substring(with: portRange)
-            urlString = cmp?.string
-            urlString?.replaceSubrange(colonRange, with: "")
-        } else {
-            urlString = cmp?.string
-        }
-        
-        guard let urlStr = urlString else {
+        guard let cmp = URLComponents(url: request.url, resolvingAgainstBaseURL: true), let rawString = cmp.string else {
             throw Error.incorrectURL
         }
         
-        self.url = urlStr
+        var urlString: String = rawString
+        var port: String?
+
+        if let portRange = cmp.rangeOfPort {
+            let colonRange = Range<String.Index>(uncheckedBounds: (urlString.index(before: portRange.lowerBound),portRange.upperBound))
+            port = urlString.substring(with: portRange)
+
+            urlString.replaceSubrange(colonRange, with: "")
+        }
+        
+        
+        self.url = urlString
         if let prt = port, let portValue = Int(prt) {
             self.port = portValue
+        } else {
+            self.port = nil
         }
     }
     
@@ -215,7 +214,7 @@ open class cURLConnection {
         curl.setSlist(.httpHeader, value: curlSlist.rawSlist)
         curl.set(.get, value: false)
         curl.set(.post, value: false)
-        curl.set(.delete, value: nil)
+        curl.set(.customRequest, value: nil)
 
         if let body = req.body {
             body.withUnsafeBytes {
@@ -228,8 +227,8 @@ open class cURLConnection {
             curl.set(.get, value: true)
         case .post:
             curl.set(.post, value: true)
-        case .delete:
-            curl.set(.delete, value: "DELETE")
+        case .delete, .put:
+            curl.set(.customRequest, value: req.method.rawValue)
         }
         
         

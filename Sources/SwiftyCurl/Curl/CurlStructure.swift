@@ -46,7 +46,7 @@ public enum cURLSetOption: Hashable {
     /// CURLOPT_POST
     case post
     /// CURLOPT_CUSTOMREQUEST
-    case delete
+    case customRequest
     /// CURLOPT_COPYPOSTFIELDS (curl copies input post data)
     case postFields
     /// CURLOPT_TIMEOUT
@@ -55,7 +55,7 @@ public enum cURLSetOption: Hashable {
     case useSsl
     /// CURLOPT_SSLENGINE_DEFAULT
     case sslEngineDefault
-    ///
+    /// CURLOPT_SSL_VERIFYHOST
     case sslVerifyHost
     /// CURLOPT_SSL_VERIFYPEER
     case sslVerifyPeer
@@ -98,7 +98,7 @@ public enum cURLSetOption: Hashable {
             return CURLOPT_HTTPHEADER
         case .get:
             return CURLOPT_HTTPGET
-        case .delete:
+        case .customRequest:
             return CURLOPT_CUSTOMREQUEST
         case .post:
             return CURLOPT_POST
@@ -179,7 +179,7 @@ public struct cURLResponse {
 }
 
 public enum cURLRequestMethod: String {
-    case get = "GET", post = "POST", delete = "DELETE"
+    case get = "GET", post = "POST", delete = "DELETE", put = "PUT"
 }
 
 public struct cURLRequest {
