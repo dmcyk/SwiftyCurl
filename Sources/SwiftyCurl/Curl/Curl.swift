@@ -118,7 +118,7 @@ public class cURL {
         curlHelperSetOptVoid(rawCURL, CURLOPT_HEADERDATA, responsePointer)
         curlHelperSetOptVoid(rawCURL, CURLOPT_WRITEDATA, responsePointer)
 
-        curl_easy_setopt_func(rawCURL, CURLOPT_WRITEFUNCTION) { (data, size, nmemb, userData) -> Int in
+        curlHelperSetOptFunc(rawCURL, CURLOPT_WRITEFUNCTION) { (data, size, nmemb, userData) -> Int in
 
             if nmemb > 0, let response = userData?.assumingMemoryBound(to: cURLResponse.self),
                 let characters = data?.assumingMemoryBound(to: UInt8.self) {
@@ -136,7 +136,7 @@ public class cURL {
             
             return size * nmemb
         }
-        curl_easy_setopt_func(rawCURL, CURLOPT_HEADERFUNCTION) { (data, size, nmemb, userData) -> Int in
+        curlHelperSetOptFunc(rawCURL, CURLOPT_HEADERFUNCTION) { (data, size, nmemb, userData) -> Int in
             if nmemb > 0, let response = userData?.assumingMemoryBound(to: cURLResponse.self),
                 let characters = data?.assumingMemoryBound(to: Int8.self) {
 

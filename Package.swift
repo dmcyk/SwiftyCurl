@@ -9,7 +9,7 @@ let package = Package(
 	
     ],
     dependencies: [
-        .Package(url: "https://github.com/osjup/CCurl.git", majorVersion: 0, minor: 2)
+        .Package(url: "https://github.com/osjup/CCurl.git", majorVersion: 0, minor: 1)
     ],
     exclude: [
         "Example"
