@@ -55,12 +55,16 @@ public enum cURLSetOption: Hashable {
     case useSsl
     /// CURLOPT_SSLENGINE_DEFAULT
     case sslEngineDefault
+    ///
+    case sslVerifyHost
     /// CURLOPT_SSL_VERIFYPEER
     case sslVerifyPeer
     /// CURLOPT_SSLCERT
     case sslCert
     /// CURLOPT_KEYPASSWD
     case passPhrase
+    /// CURLOPT_SSLKEY
+    case sslKey
     /// CURLOPT_CAPATH
     case caPath
     /// CURLOPT_HEADER
@@ -106,12 +110,16 @@ public enum cURLSetOption: Hashable {
             return CURLOPT_USE_SSL
         case .sslEngineDefault:
             return CURLOPT_SSLENGINE_DEFAULT
+        case .sslVerifyHost:
+            return CURLOPT_SSL_VERIFYHOST
         case .sslVerifyPeer:
             return CURLOPT_SSL_VERIFYPEER
         case .sslCert:
             return CURLOPT_SSLCERT
         case .passPhrase:
             return CURLOPT_KEYPASSWD
+        case .sslKey:
+            return CURLOPT_SSLKEY
         case .caPath:
             return CURLOPT_CAPATH
         case .header:

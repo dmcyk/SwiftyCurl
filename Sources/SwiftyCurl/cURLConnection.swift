@@ -27,31 +27,45 @@ open class cURLConnection {
      */
     public var certificatePath: String? = nil {
         didSet {
-            if let cert = certificatePath {
-                didSet(certificatePath: cert)
-            }
+            certificatePath = didSet(certificatePath: certificatePath)
+            
         }
     }
     
-    func didSet(certificatePath: String) {
-        let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: Int(PATH_MAX))
-        realpath(certificatePath, buffer)
-        curl.set(.sslCert, value: String(cString: buffer))
-        buffer.deinitialize(count: Int(PATH_MAX))
-        buffer.deallocate(capacity: Int(PATH_MAX))
+    public func didSet(certificatePath: String?) -> String? {
+        let real = certificatePath?.realPath()
+
+        curl.set(.sslCert, value: real)
+        if real != nil {
+            useSSL = true
+        }
+        
+        return real
+    }
+    
+    public var keyPath: String? = nil {
+        didSet {
+            keyPath = didSet(keyPath: keyPath)
+        }
+    }
+    
+    public func didSet(keyPath: String?) -> String? {
+        let real = keyPath?.realPath()
+        curl.set(.sslKey, value: real)
+        return real
+            
     }
     
     /**
      custom user-agent
      */
-    public var userAgent: String? {
+    public var userAgent: String? = nil {
         didSet {
             didSet(userAgent: userAgent)
         }
     }
     
-    func didSet(userAgent: String?) {
-        guard let userAgent = userAgent else { return }
+    public func didSet(userAgent: String?) {
         curl.set(.userAgent, value: userAgent)
     }
     
@@ -64,60 +78,57 @@ open class cURLConnection {
         }
     }
     
-    func didSet(certificatePassphrase: String?) {
-        guard let certificatePassphrase = certificatePassphrase else { return }
+    public func didSet(certificatePassphrase: String?) {
         curl.set(.passPhrase, value: certificatePassphrase)
     }
+
     
     /**
      path to certificate authority file
      */
-    public var caCertificatePath: String? {
+    public var caCertificatePath: String? = nil {
         didSet {
-            didSet(caCertificatePath: caCertificatePath)
+            caCertificatePath = didSet(caCertificatePath: caCertificatePath)
         }
     }
     
-    func didSet(caCertificatePath: String?) {
-        if let caCertificatePath = caCertificatePath {
-            let buffer = UnsafeMutablePointer<CChar>.allocate(capacity: Int(PATH_MAX))
-
-            realpath(caCertificatePath, buffer)
-            curl.set(.sslVerifyPeer, value: 1)
-            curl.set(.caPath, value: String(cString: buffer))
-            buffer.deinitialize(count: Int(PATH_MAX))
-            buffer.deallocate(capacity: Int(PATH_MAX))
-        } else {
-            curl.set(.sslVerifyPeer, value: 0)
-        }
+    public func didSet(caCertificatePath: String?) -> String? {
+        let real = caCertificatePath?.realPath()
+        curl.set(.sslVerifyPeer, value: real != nil)
+        curl.set(.caPath, value: real)
+        return real
+        
     }
     
     /**
      request url
      */
-    public var url: String? {
+    public var url: String {
         didSet {
-            if let url = url {
-                didSet(url: url)
-            }
+            didSet(url: url)
         }
     }
     
-    func didSet(url: String) {
-        curl.set(.url, value: url)
+    public func didSet(url: String) {
+            curl.set(.url, value: url)
     }
     
     /**
      request port
      */
-    public var port: Int  = 0 {
+    public var port: Int? = nil {
         didSet {
             didSet(port: port)
         }
     }
     
-    func didSet(port: Int) {
-        curl.set(.port, value: port)
+    public func didSet(port: Int?) {
+        if let p = port {
+            curl.set(.port, value: p)
+        } else {
+            curl.set(.port, value: nil)
+        }
+
     }
     
     /**
@@ -129,21 +140,40 @@ open class cURLConnection {
         }
     }
     
-    func didSet(timeout: Int) {
+    public func didSet(timeout: Int) {
         curl.set(.timeout, value: timeout)
+    }
+    
+    public var useSSL: Bool
+    
+    public func didSet(useSSL: Bool) {
+        curl.set(.sslVerifyHost, value: useSSL ? 2 : 0)
+        curl.set(.useSsl, value: useSSL)
+        curl.set(.sslEngineDefault, value: useSSL)
+
     }
     
     /**
      - parameter certificatePath:String absolute path to certificate used to instantiate secure connection
      */
-    public init(timeout: Int = 20) {
+    public init(url: String, useSSL: Bool, certificatePath: String? = nil, keyPath: String? = nil, certificatePassphrase: String? = nil, caPath: String? = nil, timeout: Int = 20) {
         self.curl = cURL()
         self.timeout = timeout
-        curl.set(.httpVersion, value: CURL_HTTP_VERSION_1_1)
+        self.url = url
+        self.useSSL = useSSL
+        self.certificatePassphrase = certificatePassphrase
+        self.caCertificatePath = didSet(caCertificatePath: caPath)
+        self.certificatePath = didSet(certificatePath: certificatePath)
+        self.keyPath = didSet(keyPath: keyPath)
+
+        
+        didSet(useSSL: useSSL)
+        didSet(url: url)
+        didSet(certificatePassphrase: certificatePassphrase)
         didSet(timeout: timeout)
-//        curl.set(.useSsl, value: true)
-//        curl.set(.sslEngineDefault, value: true)
+        
     }
+    
     public enum Error: Swift.Error {
         case incorrectURL
     }
@@ -172,8 +202,6 @@ open class cURLConnection {
         self.url = urlStr
         if let prt = port, let portValue = Int(prt) {
             self.port = portValue
-        } else {
-            self.port = 80
         }
     }
     
