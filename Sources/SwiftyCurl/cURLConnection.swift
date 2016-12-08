@@ -34,7 +34,7 @@ open class cURLConnection {
     
     public func didSet(certificatePath: String?) -> String? {
         let real = certificatePath?.realPath()
-
+        
         curl.set(.sslCert, value: real)
         if real != nil {
             useSSL = true
@@ -53,7 +53,7 @@ open class cURLConnection {
         let real = keyPath?.realPath()
         curl.set(.sslKey, value: real)
         return real
-            
+        
     }
     
     /**
@@ -81,7 +81,7 @@ open class cURLConnection {
     public func didSet(certificatePassphrase: String?) {
         curl.set(.passPhrase, value: certificatePassphrase)
     }
-
+    
     
     /**
      path to certificate authority file
@@ -110,7 +110,7 @@ open class cURLConnection {
     }
     
     public func didSet(url: String) {
-            curl.set(.url, value: url)
+        curl.set(.url, value: url)
     }
     
     /**
@@ -128,7 +128,7 @@ open class cURLConnection {
         } else {
             curl.set(.port, value: nil)
         }
-
+        
     }
     
     /**
@@ -150,7 +150,7 @@ open class cURLConnection {
         curl.set(.sslVerifyHost, value: useSSL ? 2 : 0)
         curl.set(.useSsl, value: useSSL)
         curl.set(.sslEngineDefault, value: useSSL)
-
+        
     }
     
     /**
@@ -165,7 +165,7 @@ open class cURLConnection {
         self.caCertificatePath = didSet(caCertificatePath: caPath)
         self.certificatePath = didSet(certificatePath: certificatePath)
         self.keyPath = didSet(keyPath: keyPath)
-
+        
         
         didSet(useSSL: useSSL)
         didSet(url: url)
@@ -180,18 +180,18 @@ open class cURLConnection {
     
     
     func setURLFrom(request: cURLRequest) throws {
-
+        
         guard let cmp = URLComponents(url: request.url, resolvingAgainstBaseURL: true), let rawString = cmp.string else {
             throw Error.incorrectURL
         }
         
         var urlString: String = rawString
         var port: String?
-
+        
         if let portRange = cmp.rangeOfPort {
             let colonRange = Range<String.Index>(uncheckedBounds: (urlString.index(before: portRange.lowerBound),portRange.upperBound))
             port = urlString.substring(with: portRange)
-
+            
             urlString.replaceSubrange(colonRange, with: "")
         }
         
@@ -215,10 +215,17 @@ open class cURLConnection {
         curl.set(.get, value: false)
         curl.set(.post, value: false)
         curl.set(.customRequest, value: nil)
-
+        
+        var bodyCopy: UnsafeMutablePointer<Int8>? = nil
+        var length = 0
         if let body = req.body {
-            body.withUnsafeBytes {
-                curl.set(.postFields, value: $0)
+            length = body.count + 1
+            bodyCopy = UnsafeMutablePointer<Int8>.allocate(capacity: length)
+            bodyCopy?.initialize(to: 0, count: body.count + 1)
+            body.withUnsafeBytes { (raw:UnsafePointer<Int8>) in
+                _ = strncpy(bodyCopy!, raw, body.count)
+                let _body = UnsafePointer<Int8>(bodyCopy!)
+                curl.set(.postFields, value: _body)
             }
         }
         
@@ -232,7 +239,12 @@ open class cURLConnection {
         }
         
         
-        let result = try curl.execute() // persist reference to header's slist 
+        let result = try curl.execute() // persist reference to header's slist
+        
+        if let body = bodyCopy {
+            body.deallocate(capacity: length)
+        }
+        
         return result 
     }
 }

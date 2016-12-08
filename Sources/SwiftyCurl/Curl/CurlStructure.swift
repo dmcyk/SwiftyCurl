@@ -47,8 +47,9 @@ public enum cURLSetOption: Hashable {
     case post
     /// CURLOPT_CUSTOMREQUEST
     case customRequest
-    /// CURLOPT_COPYPOSTFIELDS (curl copies input post data)
     case postFields
+    /// CURLOPT_COPYPOSTFIELDS (curl copies input post data)
+    case copypostFields
     /// CURLOPT_TIMEOUT
     case timeout
     /// CURLOPT_USE_SSL
@@ -104,6 +105,8 @@ public enum cURLSetOption: Hashable {
             return CURLOPT_POST
         case .postFields:
             return CURLOPT_COPYPOSTFIELDS
+        case .copypostFields:
+            return CURLOPT_POSTFIELDS
         case .timeout:
             return CURLOPT_TIMEOUT
         case .useSsl:
@@ -156,7 +159,7 @@ public enum cURLOptionType {
 public struct cURLResponse {
     
     /**
-    -1 stands for code not yet set
+     -1 stands for code not yet set
      */
     public var code: Int = -1
     
@@ -168,7 +171,7 @@ public struct cURLResponse {
     /**
      response body
      */
-    public var body: Data?  = nil 
+    public var body: Data?  = nil
     
     let parseMode: cURLParseOption
     
@@ -200,7 +203,7 @@ public struct cURLRequest {
                 var headers = rawHeaders
                 headers["Content-Type"] = "application/json"
                 headers["Accept"] = "application/json"
-                return headers 
+                return headers
             }
             return rawHeaders
         }
@@ -214,7 +217,7 @@ public struct cURLRequest {
         self.url = url
         self.method = method
         self.rawHeaders = headers
-        self.body = body 
+        self.body = body
     }
 }
 
