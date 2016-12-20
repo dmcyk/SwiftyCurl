@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  EasyAPNS
+//  cURLConnection.swift
+//  SwiftyCurl
 //
 //  Created by Damian Malarczyk on 04.07.2016.
 //
@@ -156,7 +156,7 @@ open class cURLConnection {
     /**
      - parameter certificatePath:String absolute path to certificate used to instantiate secure connection
      */
-    public init(url: String, useSSL: Bool, certificatePath: String? = nil, keyPath: String? = nil, certificatePassphrase: String? = nil, caPath: String? = nil, timeout: Int = 20) {
+    public init(useSSL: Bool, url: String = "", certificatePath: String? = nil, keyPath: String? = nil, certificatePassphrase: String? = nil, caPath: String? = nil, timeout: Int = 20) {
         self.curl = cURL()
         self.timeout = timeout
         self.url = url
@@ -204,7 +204,7 @@ open class cURLConnection {
         }
     }
     
-    open func request(_ req: cURLRequest) throws -> cURLResponse? {
+    open func request(_ req: cURLRequest) throws -> cURLResponse {
         
         try setURLFrom(request: req)
         let httpHeaders = req.headers.map {

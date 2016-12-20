@@ -1,6 +1,6 @@
 //
 //  Curl.swift
-//  EasyAPNS
+//  SwiftyCurl
 //
 //  Created by Damian Malarczyk on 04.07.2016.
 //
@@ -123,13 +123,13 @@ public class cURL {
             if nmemb > 0, let response = userData?.assumingMemoryBound(to: cURLResponse.self),
                 let characters = data?.assumingMemoryBound(to: UInt8.self) {
                 
-                if response.pointee.body == nil {
+                if response.pointee.rawBody == nil {
                     let buffer = Array(characters.withMemoryRebound(to: UInt8.self, capacity: nmemb) {
                         UnsafeBufferPointer(start: $0, count: nmemb)
                     })
-                    response.pointee.body = Data(bytes: buffer)
+                    response.pointee.rawBody = Data(bytes: buffer)
                 } else {
-                    response.pointee.body?.append(characters, count: nmemb)
+                    response.pointee.rawBody?.append(characters, count: nmemb)
                 }
                 
             }

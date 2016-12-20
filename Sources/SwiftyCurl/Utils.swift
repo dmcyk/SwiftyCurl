@@ -1,6 +1,6 @@
 //
 //  Utils.swift
-//  EasyAPNS
+//  SwiftyCurl
 //
 //  Created by Damian Malarczyk on 04.07.2016.
 //

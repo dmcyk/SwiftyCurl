@@ -1,6 +1,6 @@
 //
-//  Slist.swift
-//  EasyAPNS
+//  CurlSlist.swift
+//  SwiftyCurl
 //
 //  Created by Damian Malarczyk on 07.07.2016.
 //

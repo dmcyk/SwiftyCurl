@@ -1,6 +1,6 @@
 //
 //  CurlStructure.swift
-//  EasyAPNS
+//  SwiftyCurl
 //
 //  Created by Damian Malarczyk on 13.07.2016.
 //
@@ -153,6 +153,26 @@ public enum cURLOptionType {
 }
 
 
+public protocol DataInitializable {
+    init?(data: Data)
+}
+
+extension String: DataInitializable {
+    public init?(data: Data) {
+        if let str = String.init(data: data, encoding: .utf8) {
+            self = str
+        } else {
+            return nil
+        }
+    }
+}
+
+extension Data: DataInitializable {
+    public init?(data: Data) {
+        self = data
+    }
+}
+
 /**
  Structural representation of raw curl response
  */
@@ -171,7 +191,14 @@ public struct cURLResponse {
     /**
      response body
      */
-    public var body: Data?  = nil
+    public var rawBody: Data?  = nil
+    
+    public func body<T: DataInitializable>() -> T? {
+        if let rb = rawBody {
+            return T(data: rb)
+        }
+        return nil
+    }
     
     let parseMode: cURLParseOption
     

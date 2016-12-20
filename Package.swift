@@ -5,6 +5,12 @@ let package = Package(
     targets: [
         Target(
             name: "SwiftyCurl"
+        ),
+        Target(
+            name: "Example",
+            dependencies: [
+                .Target(name: "SwiftyCurl")
+            ]
         )
 	
     ],
