@@ -181,23 +181,20 @@ open class cURLConnection {
     
     func setURLFrom(request: cURLRequest) throws {
         
-        guard let cmp = URLComponents(url: request.url, resolvingAgainstBaseURL: true), let rawString = cmp.string else {
+        guard let cmp = URLComponents(url: request.url, resolvingAgainstBaseURL: true),
+            var urlString = cmp.string else {
             throw Error.incorrectURL
         }
         
-        var urlString: String = rawString
-
         if let portValue = cmp.port {
-          urlString = urlString.replacingOccurrences(of: ":\(portValue)", with: "")
+            urlString = urlString.replacingOccurrences(of: ":\(portValue)", with: "")
+            self.port = portValue
+        } else {
+            self.port = nil
         }
 
         self.url = urlString
 
-        if let port = cmp.port {
-          self.port = port
-        } else {
-          self.port = nil
-        }
     }
 
     open func request(_ req: cURLRequest) throws -> cURLResponse {
