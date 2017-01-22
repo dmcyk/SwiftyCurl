@@ -186,24 +186,20 @@ open class cURLConnection {
         }
         
         var urlString: String = rawString
-        var port: String?
-        
-        if let portRange = cmp.rangeOfPort {
-            let colonRange = Range<String.Index>(uncheckedBounds: (urlString.index(before: portRange.lowerBound),portRange.upperBound))
-            port = urlString.substring(with: portRange)
-            
-            urlString.replaceSubrange(colonRange, with: "")
+
+        if let portValue = cmp.port {
+          urlString = urlString.replacingOccurrences(of: ":\(portValue)", with: "")
         }
-        
-        
+
         self.url = urlString
-        if let prt = port, let portValue = Int(prt) {
-            self.port = portValue
+
+        if let port = cmp.port {
+          self.port = port
         } else {
-            self.port = nil
+          self.port = nil
         }
     }
-    
+
     open func request(_ req: cURLRequest) throws -> cURLResponse {
         
         try setURLFrom(request: req)
