@@ -7,7 +7,7 @@ let package = Package(
             name: "SwiftyCurl"
         ),
         Target(
-            name: "Example",
+            name: "SwiftyCurlExample",
             dependencies: [
                 .Target(name: "SwiftyCurl")
             ]
@@ -18,6 +18,6 @@ let package = Package(
         .Package(url: "https://github.com/dmcyk/CCurl.git", majorVersion: 0, minor: 1)
     ],
     exclude: [
-        "Example"
+        "SwiftyCurlExample"
     ]
 )
