@@ -24,7 +24,7 @@ internal extension String {
         
         let newValue = String(cString: buffer)
         buffer.deinitialize(count: Int(PATH_MAX))
-        buffer.deallocate(capacity: Int(PATH_MAX))
+        buffer.deallocate()
         return newValue
     }
 }

@@ -150,9 +150,8 @@ public class cURL {
                 }
                 response.pointee.headers.append(resultString)
                 
-                buffer.deinitialize()
-                buffer.deallocate(capacity: size * nmemb + 1)
-                
+                buffer.deinitialize(count: size * nmemb + 1)
+                buffer.deallocate()
             }
             return size * nmemb
         }

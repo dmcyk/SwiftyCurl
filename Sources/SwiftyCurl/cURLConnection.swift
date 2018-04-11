@@ -214,7 +214,7 @@ open class cURLConnection {
         if let body = req.body {
             length = body.count + 1
             bodyCopy = UnsafeMutablePointer<Int8>.allocate(capacity: length)
-            bodyCopy?.initialize(to: 0, count: body.count + 1)
+            bodyCopy?.initialize(repeating: 0, count: body.count + 1)
             body.withUnsafeBytes { (raw:UnsafePointer<Int8>) in
                 _ = strncpy(bodyCopy!, raw, body.count)
                 let _body = UnsafePointer<Int8>(bodyCopy!)
@@ -235,7 +235,8 @@ open class cURLConnection {
         let result = try curl.execute() // persist reference to header's slist
         
         if let body = bodyCopy {
-            body.deallocate(capacity: length)
+            body.deinitialize(count: length)
+            body.deallocate()
         }
         
         return result 

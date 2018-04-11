@@ -1,23 +1,26 @@
+// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(
     name: "SwiftyCurl",
-    targets: [
-        Target(
-            name: "SwiftyCurl"
-        ),
-        Target(
-            name: "SwiftyCurlExample",
-            dependencies: [
-                .Target(name: "SwiftyCurl")
-            ]
-        )
-	
+    products: [
+        .library(name: "SwiftyCurl", targets: ["SwiftyCurl"]),
+        .executable(name: "SwiftyCurlExample", targets: ["SwiftyCurlExample"])
     ],
     dependencies: [
-        .Package(url: "https://github.com/dmcyk/CCurl.git", majorVersion: 0, minor: 1)
+        .package(url: "https://github.com/dmcyk/CCurl.git", .upToNextMajor(from: "0.2.0"))
     ],
-    exclude: [
-        "SwiftyCurlExample"
+    targets: [
+        .target(
+            name: "SwiftyCurl",
+            dependencies: [
+            ]
+        ),
+        .target(
+            name: "SwiftyCurlExample",
+            dependencies: [
+                "SwiftyCurl"
+            ]
+        )
     ]
 )
